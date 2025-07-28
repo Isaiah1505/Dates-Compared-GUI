@@ -41,9 +41,17 @@ public class DayCounterController {
     	fromDateFull.setText(fromDateFullStr);
     	toDateFull.setText(toDateFullStr);
     	
+    	//Code Functionality
     	// dateDifference doesn't include end date and is accurate
-    	// days conversion isn't correct
+    	// days conversion isn't correct and other units based off of days conversion
     	// no error handling when inputs are empty or not correct format (ie not numbers, wrong ranges)
+    	// Change inputs to 1 string per date to shrink code and simplify error handling for wrong inputs
+    	// Format date difference time units (commas for big numbers & truncate or round decimals)
+    	//GUI Style & Layout
+    	// Add CSS styling to page to improve appeal
+    	// Change element layouts on page for a better look
+    	//File Hierarchy
+    	// Make a dedicated folders, like Controllers, Views, Resources
     	if(fromDate.isBefore(toDate)) {
     		
     		Period periodDiff = fromDate.until(toDate);
