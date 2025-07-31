@@ -5,12 +5,11 @@ import java.time.Period;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
 public class DayCounterController {
-	@FXML
-    private TextField fromDays, fromMonths, fromYears, toDays, toMonths, toYears;
 
     @FXML
     private TextField dateDiff, daysBetween, yearsBetween, monthsBetween, weeksBetween, hoursBetween, minsBetween, secBetween;
@@ -18,14 +17,18 @@ public class DayCounterController {
     @FXML
     private Text fromDateFull, toDateFull, errorTxt;
     
+    @FXML
+    private DatePicker fromCalDate, toCalDate;
+    
     public void counterBtn(ActionEvent e) {
     	// Use LocalDate.minus methods to get days between
     	// Java.time API doc https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html
-    	String fromDateStr = fromYears.getText()+"-"+fromMonths.getText()+"-"+fromDays.getText();
-    	String toDateStr = toYears.getText()+"-"+toMonths.getText()+"-"+toDays.getText();
+    	
+    	System.out.println("New DatePicker from Obj: "+fromCalDate.getValue());
+    	System.out.println("New DatePicker to Obj: "+toCalDate.getValue());
 
-    	LocalDate fromDate = LocalDate.parse(fromDateStr);
-    	LocalDate toDate = LocalDate.parse(toDateStr);
+    	LocalDate fromDate = fromCalDate.getValue();
+    	LocalDate toDate = toCalDate.getValue();
     	
     	System.out.println(fromDate);
     	System.out.println(toDate);
@@ -82,19 +85,15 @@ public class DayCounterController {
     		errorTxt.setText("");
 
     		
-    	}else if(fromDate.isAfter(toDate) || fromDate.isEqual(toDate)) {
+    	}else if(fromDate.isAfter(toDate) || fromDate.isEqual(toDate) ) {
     		errorTxt.setText("Not a valid range. Equal to or before from date");
     	}
     	
     }
 
     public void clearBtn(ActionEvent e) {
-    	fromYears.setText("");
-    	fromMonths.setText("");
-    	fromDays.setText("");
-    	toYears.setText("");
-    	toMonths.setText("");
-    	toDays.setText("");
+    	fromCalDate.setValue(null);
+    	toCalDate.setValue(null);
     	fromDateFull.setText("dd/mm/yyyy");
     	toDateFull.setText("dd/mm/yyyy");
     	dateDiff.setText("");
@@ -110,12 +109,8 @@ public class DayCounterController {
     
     // mainly for quick testing & debugging
     public void exampleDate(ActionEvent e) {
-    	fromYears.setText("2021");
-    	fromMonths.setText("05");
-    	fromDays.setText("11");
-    	toYears.setText("2025");
-    	toMonths.setText("08");
-    	toDays.setText("15");
+    	fromCalDate.setValue(LocalDate.parse("2021-05-11"));
+    	toCalDate.setValue(LocalDate.parse("2025-08-15"));
     	errorTxt.setText("");
     	counterBtn(e);
     }
