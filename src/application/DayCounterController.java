@@ -5,6 +5,7 @@ import java.time.Period;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
@@ -20,8 +21,11 @@ public class DayCounterController {
     @FXML
     private DatePicker fromCalDate, toCalDate;
     
+    @FXML
+    private CheckBox endDateCheck;
+    
+    
     public void counterBtn(ActionEvent e) {
-    	// Use LocalDate.minus methods to get days between
     	// Java.time API doc https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html
     	
     	System.out.println("New DatePicker from Obj: "+fromCalDate.getValue());
@@ -30,65 +34,81 @@ public class DayCounterController {
     	LocalDate fromDate = fromCalDate.getValue();
     	LocalDate toDate = toCalDate.getValue();
     	
-    	System.out.println(fromDate);
-    	System.out.println(toDate);
-    	
-    	String fromWeekDay = titleCase(String.valueOf(fromDate.getDayOfWeek()));
-    	String fromMonth = titleCase(String.valueOf(fromDate.getMonth()));
-    	String toWeekDay = titleCase(String.valueOf(toDate.getDayOfWeek()));
-    	String toMonth = titleCase(String.valueOf(toDate.getMonth()));
-    	
-    	String fromDateFullStr = String.valueOf(fromWeekDay+", "+fromMonth+" "+fromDate.getDayOfMonth()+" "+fromDate.getYear());
-    	String toDateFullStr = String.valueOf(toWeekDay+", "+toMonth+" "+toDate.getDayOfMonth()+" "+toDate.getYear());
-
-    	fromDateFull.setText(fromDateFullStr);
-    	toDateFull.setText(toDateFullStr);
-    	
     	//Code Functionality
-    	// dateDifference doesn't include end date and is accurate
     	// days conversion isn't correct and other units based off of days conversion
-    	// no error handling when inputs are empty or not correct format (ie not numbers, wrong ranges)
-    	// Change inputs to 1 string per date to shrink code and simplify error handling for wrong inputs
     	// Format date difference time units (commas for big numbers & truncate or round decimals)
     	//GUI Style & Layout
     	// Add CSS styling to page to improve appeal
     	// Change element layouts on page for a better look
     	//File Hierarchy
     	// Make a dedicated folders, like Controllers, Views, Resources
-    	if(fromDate.isBefore(toDate)) {
-    		
-    		Period periodDiff = fromDate.until(toDate);
-    		LocalDate dateDifference = LocalDate.of(periodDiff.getYears(), periodDiff.getMonths(), periodDiff.getDays());
-    		
-    		System.out.println(dateDifference);
-    		System.out.println(dateDifference.getDayOfYear());
-    		System.out.println(dateDifference.getYear());
-    		
-    		int totalDays = (dateDifference.getYear() * 365) + (dateDifference.getMonthValue() * 30 + dateDifference.getDayOfMonth());
-    		double totalYears = (double) totalDays / 365;
-    		double totalMonths = (double) totalDays / 30;
-    		double totalWeeks = (double) totalDays / 7;
-    		int totalHours = totalDays * 24;
-    		int totalMins = totalHours * 60;
-    		int totalSec = totalMins * 60;
-    		
-    		String periodDiffStr = periodDiff.getYears()+" Years, "+periodDiff.getMonths()+" Months & "+periodDiff.getDays()+" Days";
-    		
-    		dateDiff.setText(periodDiffStr);
-    		yearsBetween.setText(String.valueOf(totalYears));
-    		monthsBetween.setText(String.valueOf(totalMonths));
-    		weeksBetween.setText(String.valueOf(totalWeeks));
-    		daysBetween.setText(String.valueOf(totalDays));
-    		hoursBetween.setText(String.valueOf(totalHours));
-    		minsBetween.setText(String.valueOf(totalMins));
-    		secBetween.setText(String.valueOf(totalSec));
-    		errorTxt.setText("");
+    	try {
+    		if(fromDate.isBefore(toDate)) {
+    			
+    			System.out.println(fromDate);
+    			System.out.println(toDate);
+        	
+    			String fromWeekDay = titleCase(String.valueOf(fromDate.getDayOfWeek()));
+    			String fromMonth = titleCase(String.valueOf(fromDate.getMonth()));
+    			String toWeekDay = titleCase(String.valueOf(toDate.getDayOfWeek()));
+    			String toMonth = titleCase(String.valueOf(toDate.getMonth()));
+    			
+    			String fromDateFullStr = String.valueOf(fromWeekDay+", "+fromMonth+" "+fromDate.getDayOfMonth()+" "+fromDate.getYear());
+    			String toDateFullStr = String.valueOf(toWeekDay+", "+toMonth+" "+toDate.getDayOfMonth()+" "+toDate.getYear());
 
+    			fromDateFull.setText(fromDateFullStr);
+    			toDateFull.setText(toDateFullStr);
     		
-    	}else if(fromDate.isAfter(toDate) || fromDate.isEqual(toDate) ) {
-    		errorTxt.setText("Not a valid range. Equal to or before from date");
+    			Period periodDiff = fromDate.until(toDate);
+    			
+    			System.out.println(periodDiff);
+    			System.out.println(periodDiff.getYears());
+    			// calls endDate function
+    			periodDiff = periodDiff.plusDays(endDateCalc());
+    			
+    			int totalDays = (periodDiff.getYears() * 365) + (periodDiff.getMonths() * 30 + periodDiff.getDays());
+    			double totalYears = (double) totalDays / 365;
+    			double totalMonths = (double) totalDays / 30;
+    			double totalWeeks = (double) totalDays / 7;
+    			int totalHours = totalDays * 24;
+    			int totalMins = totalHours * 60;
+    			int totalSec = totalMins * 60;
+    			
+    			String periodDiffStr = periodDiff.getYears()+" Years, "+periodDiff.getMonths()+" Months & "+periodDiff.getDays()+" Days";
+    		
+    			dateDiff.setText(periodDiffStr);
+    			yearsBetween.setText(String.valueOf(totalYears));
+    			monthsBetween.setText(String.valueOf(totalMonths));
+    			weeksBetween.setText(String.valueOf(totalWeeks));
+    			daysBetween.setText(String.valueOf(totalDays));
+    			hoursBetween.setText(String.valueOf(totalHours));
+    			minsBetween.setText(String.valueOf(totalMins));
+    			secBetween.setText(String.valueOf(totalSec));
+    			errorTxt.setText("");
+    			
+    			
+    		}
+    		else if(fromDate.isAfter(toDate) || fromDate.isEqual(toDate) ) {
+    			errorTxt.setText("Given date range is not valid. Either equal to or before from date!");
+    		}
+    	}
+    	catch(NullPointerException error) {
+    		errorTxt.setText("One or both given dates are null/blank. Enter or select valid dates!");
+    		System.out.println(error.getMessage());
+
     	}
     	
+    }
+    // if check box is selected, end date is included in calculation 
+    public int endDateCalc() {
+    	int endDate = 0;
+    	if(endDateCheck.isSelected()) {
+    		endDate = 1;
+    	}else {
+    		endDate = 0;
+    	}
+    	System.out.println(endDate);
+    	return endDate;
     }
 
     public void clearBtn(ActionEvent e) {
