@@ -77,9 +77,9 @@ public class DayCounterController {
     			String periodDiffStr = periodDiff.getYears()+" Years, "+periodDiff.getMonths()+" Months & "+periodDiff.getDays()+" Days";
     		
     			dateDiff.setText(periodDiffStr);
-    			yearsBetween.setText(String.valueOf(totalYears));
-    			monthsBetween.setText(String.valueOf(totalMonths));
-    			weeksBetween.setText(String.valueOf(totalWeeks));
+    			yearsBetween.setText(decimalFormatting(totalYears));
+    			monthsBetween.setText(decimalFormatting(totalMonths));
+    			weeksBetween.setText(decimalFormatting(totalWeeks));
     			daysBetween.setText(String.valueOf(totalDays));
     			hoursBetween.setText(String.valueOf(totalHours));
     			minsBetween.setText(String.valueOf(totalMins));
@@ -99,7 +99,8 @@ public class DayCounterController {
     	}
     	
     }
-    // if check box is selected, end date is included in calculation 
+    
+    // if check box is selected, end date is included in calculation
     public int endDateCalc() {
     	int endDate = 0;
     	if(endDateCheck.isSelected()) {
@@ -109,6 +110,21 @@ public class DayCounterController {
     	}
     	System.out.println(endDate);
     	return endDate;
+    }
+    // removes non-significant zeros & decimal no. is whole
+    // need to also make it remove all non-significant zeros from decimal no. too
+    public String decimalFormatting(double toRound) {
+    	String formatDouble = String.format("%.3f", toRound);
+    	if(formatDouble.contains(".000")) {
+    		for(int i = 0; i < formatDouble.length(); i++) {
+    			if(formatDouble.charAt(i) == '.') {
+    				formatDouble = formatDouble.substring(0, i);
+    				break;
+    			}
+    		}
+    	}
+    	System.out.println(formatDouble);
+    	return formatDouble;
     }
 
     public void clearBtn(ActionEvent e) {
