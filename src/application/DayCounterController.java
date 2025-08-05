@@ -2,6 +2,7 @@ package application;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.regex.Pattern;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -17,7 +18,7 @@ public class DayCounterController {
     
     @FXML
     private Text fromDateFull, toDateFull, errorTxt;
-    
+        
     @FXML
     private DatePicker fromCalDate, toCalDate;
     
@@ -36,7 +37,6 @@ public class DayCounterController {
     	
     	//Code Functionality
     	// days conversion isn't correct and other units based off of days conversion
-    	// Format date difference time units (commas for big numbers & truncate or round decimals)
     	//GUI Style & Layout
     	// Add CSS styling to page to improve appeal
     	// Change element layouts on page for a better look
@@ -64,7 +64,7 @@ public class DayCounterController {
     			System.out.println(periodDiff);
     			System.out.println(periodDiff.getYears());
     			// calls endDate function
-    			periodDiff = periodDiff.plusDays(endDateCalc());
+    			periodDiff = periodDiff.plusDays(endDateInclusion());
     			
     			int totalDays = (periodDiff.getYears() * 365) + (periodDiff.getMonths() * 30 + periodDiff.getDays());
     			double totalYears = (double) totalDays / 365;
@@ -77,13 +77,13 @@ public class DayCounterController {
     			String periodDiffStr = periodDiff.getYears()+" Years, "+periodDiff.getMonths()+" Months & "+periodDiff.getDays()+" Days";
     		
     			dateDiff.setText(periodDiffStr);
-    			yearsBetween.setText(decimalFormatting(totalYears));
-    			monthsBetween.setText(decimalFormatting(totalMonths));
-    			weeksBetween.setText(decimalFormatting(totalWeeks));
-    			daysBetween.setText(String.valueOf(totalDays));
-    			hoursBetween.setText(String.valueOf(totalHours));
-    			minsBetween.setText(String.valueOf(totalMins));
-    			secBetween.setText(String.valueOf(totalSec));
+    			yearsBetween.setText(removeExxZeros(totalYears));
+    			monthsBetween.setText(removeExxZeros(totalMonths));
+    			weeksBetween.setText(removeExxZeros(totalWeeks));
+    			daysBetween.setText(String.format("%,d",totalDays));
+    			hoursBetween.setText(String.format("%,d",totalHours));
+    			minsBetween.setText(String.format("%,d",totalMins));
+    			secBetween.setText(String.format("%,d",totalSec));
     			errorTxt.setText("");
     			
     			
@@ -101,7 +101,7 @@ public class DayCounterController {
     }
     
     // if check box is selected, end date is included in calculation
-    public int endDateCalc() {
+    public int endDateInclusion() {
     	int endDate = 0;
     	if(endDateCheck.isSelected()) {
     		endDate = 1;
@@ -111,22 +111,34 @@ public class DayCounterController {
     	System.out.println(endDate);
     	return endDate;
     }
-    // removes non-significant zeros & decimal no. is whole
-    // need to also make it remove all non-significant zeros from decimal no. too
-    public String decimalFormatting(double toRound) {
-    	String formatDouble = String.format("%.3f", toRound);
-    	if(formatDouble.contains(".000")) {
-    		for(int i = 0; i < formatDouble.length(); i++) {
-    			if(formatDouble.charAt(i) == '.') {
-    				formatDouble = formatDouble.substring(0, i);
-    				break;
-    			}
+    // removes non-significant zeros (ie .000, .200,.020) and adds commas where needed
+    public String removeExxZeros(double toRound) {
+    	Pattern zeroPattern1 = Pattern.compile(".[1-9]00"), zeroPattern2 = Pattern.compile(".[0-9][1-9]0");
+    	String formatDouble = String.format("%,.3f", toRound);
+    	
+    	for(int i = 0; i < formatDouble.length(); i++) {
+    		if(formatDouble.charAt(i) == '.'&& formatDouble.contains(".000")) {
+    			formatDouble = formatDouble.substring(0, i);
+    			break;
+    			
+    		}else if(formatDouble.charAt(i) == '.' && zeroPattern1.matcher(formatDouble).find()) {
+    			formatDouble = formatDouble.substring(0, i+2);
+    			break;
+    			
+    		}else if(formatDouble.charAt(i) == '.' && zeroPattern2.matcher(formatDouble).find()) {
+    			formatDouble = formatDouble.substring(0, i+3);
+    			break;
+    				
     		}
     	}
+    	
     	System.out.println(formatDouble);
     	return formatDouble;
     }
-
+    
+    
+    
+    // resets all fields to defaultS
     public void clearBtn(ActionEvent e) {
     	fromCalDate.setValue(null);
     	toCalDate.setValue(null);
@@ -150,7 +162,7 @@ public class DayCounterController {
     	errorTxt.setText("");
     	counterBtn(e);
     }
-    
+    // capitalizes first letter of a given string
     public String titleCase(String toNormalise) {
     	String firstChar = String.valueOf(toNormalise.charAt(0)).toUpperCase();
     	toNormalise = firstChar + toNormalise.substring(1).toLowerCase();
