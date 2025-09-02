@@ -1,3 +1,21 @@
+/*	Date Comparison GUI Application
+ * 	
+ * 	Asks the user for two valid dates, then displays the full dates, the length of time 
+ * 	between those two dates in various units of time. These units being days, weeks, 
+ * 	months, years, hours, minutes & seconds.
+ * 
+ * 	Code Written By Isaiah Wallace
+ * 
+ * 	Completed Version Date: 2025-09-02
+ * 	
+ * 	Repository Link : https://github.com/Isaiah1505/Dates-Compared-GUI
+ * 
+ * 	Built using JavaFX Framework Version : 24.0.2
+ * 
+ * 	Java Version : 22.0.1
+ * 
+ * */
+
 package application;
 
 import java.time.LocalDate;
@@ -11,7 +29,7 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 
-public class DayCounterController {
+public class DatesComparedController {
 
     @FXML
     private TextField dateDiff, daysBetween, yearsBetween, monthsBetween, weeksBetween, hoursBetween, minsBetween, secBetween;
@@ -28,26 +46,19 @@ public class DayCounterController {
     
     public void counterBtn(ActionEvent e) {
     	// Java.time API doc https://docs.oracle.com/javase/8/docs/api/java/time/LocalDate.html
-    	
-    	System.out.println("New DatePicker from Obj: "+fromCalDate.getValue());
-    	System.out.println("New DatePicker to Obj: "+toCalDate.getValue());
-
+    	// retrieves values from DatePickers & turns into LocalDate Objs
     	LocalDate fromDate = fromCalDate.getValue();
     	LocalDate toDate = toCalDate.getValue();
     	
     	//Code Functionality
-    	// days conversion isn't correct and other units based off of days conversion
-    	//GUI Style & Layout
-    	// Add CSS styling to page to improve appeal
-    	// Change element layouts on page for a better look
+    	
     	//File Hierarchy
     	// Make a dedicated folders, like Controllers, Views, Resources
+    	// try catch block for exceptions, main sections of code (mainly NullPointerExceptions)
     	try {
     		if(fromDate.isBefore(toDate)) {
     			
-    			System.out.println(fromDate);
-    			System.out.println(toDate);
-        	
+    			// titleCase Conversion for presentation of the full dates
     			String fromWeekDay = titleCase(String.valueOf(fromDate.getDayOfWeek()));
     			String fromMonth = titleCase(String.valueOf(fromDate.getMonth()));
     			String toWeekDay = titleCase(String.valueOf(toDate.getDayOfWeek()));
@@ -58,14 +69,12 @@ public class DayCounterController {
 
     			fromDateFull.setText(fromDateFullStr);
     			toDateFull.setText(toDateFullStr);
-    		
+    			// date difference in years, months and days
     			Period periodDiff = fromDate.until(toDate);
     			
-    			System.out.println(periodDiff);
-    			System.out.println(periodDiff.getYears());
-    			// calls endDate function
+    			// calls endDate function to see if user wants the end date included
     			periodDiff = periodDiff.plusDays(endDateInclusion());
-    			
+    			// calculation for different units of time
     			int totalDays = (periodDiff.getYears() * 365) + (periodDiff.getMonths() * 30 + periodDiff.getDays());
     			double totalYears = (double) totalDays / 365;
     			double totalMonths = (double) totalDays / 30;
@@ -75,7 +84,7 @@ public class DayCounterController {
     			int totalSec = totalMins * 60;
     			
     			String periodDiffStr = periodDiff.getYears()+" Years, "+periodDiff.getMonths()+" Months & "+periodDiff.getDays()+" Days";
-    		
+    			// presenting all units of time to user
     			dateDiff.setText(periodDiffStr);
     			yearsBetween.setText(removeExxZeros(totalYears));
     			monthsBetween.setText(removeExxZeros(totalMonths));
@@ -92,9 +101,15 @@ public class DayCounterController {
     			errorTxt.setText("Given date range is not valid. Either equal to or before from date!");
     		}
     	}
-    	catch(NullPointerException error) {
-    		errorTxt.setText("One or both given dates are null/blank. Enter or select valid dates!");
-    		System.out.println(error.getMessage());
+    	// catches any exception, then checks if it's for a null value, if not, generic message is displayed
+    	catch(Exception error) {
+    		if(error.getClass().equals(NullPointerException.class)) {
+    			errorTxt.setText("One or both given dates are null/blank. Enter or select valid dates!");
+    		}
+    		else {
+    			errorTxt.setText("An Error Has Occurred.");
+    		}
+			System.out.println(error.getMessage());
 
     	}
     	
@@ -155,7 +170,7 @@ public class DayCounterController {
 		errorTxt.setText("");
     }
     
-    // mainly for quick testing & debugging
+    // shows user a quick example of application in use & for quick testing & debugging
     public void exampleDate(ActionEvent e) {
     	fromCalDate.setValue(LocalDate.parse("2021-05-11"));
     	toCalDate.setValue(LocalDate.parse("2025-08-15"));
